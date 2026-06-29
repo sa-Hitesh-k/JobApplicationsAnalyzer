@@ -12,7 +12,10 @@ def main():
 load_dotenv()
 db_url=os.getenv("DATABASE_URL")
 
-engine = create_engine(db_url)
+engine = create_engine(
+    db_url,
+    pool_pre_ping=True
+)
 SQLModel.metadata.create_all(engine)
 
 # creating model
@@ -43,6 +46,10 @@ app.add_middleware(
 def get_session():
     with Session(engine) as session:
         yield session
+
+@app.get("/")
+def root():
+    return {"status": "running"}
 
 # function to fetch all the companies from the database 
 @app.get("/all-companies/", summary="companies' names", description="Get names of all the companies")
