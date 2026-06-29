@@ -35,7 +35,7 @@ class jobs(SQLModel, table=True):
 app=FastAPI()
 
 # adding middleware so that frontend can acces this code
-origins=['http://localhost:8501']
+origins=['http://localhost:8501', 'https://shk-job-applications-analyzer.streamlit.app/']
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
