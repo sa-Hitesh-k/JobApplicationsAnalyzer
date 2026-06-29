@@ -1,3 +1,4 @@
+# Importing all the libraries
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import create_engine, Session, SQLModel, Field, select, col, func
@@ -7,12 +8,14 @@ import os
 def main():
     print("Hello from jobapplicationsanalyzer!")
 
+# loading the database url
 load_dotenv()
 db_url=os.getenv("DATABASE_URL")
 
 engine = create_engine(db_url)
 SQLModel.metadata.create_all(engine)
 
+# creating model
 class jobs(SQLModel, table=True):
     __tablename__="jobs"
     application_id :int =Field(default=None, primary_key=True)
@@ -28,6 +31,7 @@ class jobs(SQLModel, table=True):
 
 app=FastAPI()
 
+# adding middleware so that frontend can acces this code
 origins=['http://localhost:8501']
 app.add_middleware(
     CORSMiddleware,
@@ -40,22 +44,27 @@ def get_session():
     with Session(engine) as session:
         yield session
 
+# function to fetch all the companies from the database 
 @app.get("/all-companies/", summary="companies' names", description="Get names of all the companies")
 def get_companies_names(sesssion: Session=Depends(get_session)):
     return sesssion.exec(select(jobs.company_name).distinct(jobs.company_name)).all()
 
+# function to get all the job roles from the database 
 @app.get("/all-job-roles/", summary="job roles", description="Get all the jobs")
 def get_jobs(sesssion: Session=Depends(get_session)):
     return sesssion.exec(select(jobs.job_role).distinct(jobs.job_role)).all()
 
+# function to get all the job types from the database 
 @app.get("/all-job-types/", summary="job types", description="Get all the jobs")
 def get_companies_names(sesssion: Session=Depends(get_session)):
     return sesssion.exec(select(jobs.job_type).distinct(jobs.job_type)).all()
 
+# function to get all the platforms from the database 
 @app.get("/all-platforms/", summary="platforms", description="See all the platforms")
 def get_companies_names(sesssion: Session=Depends(get_session)):
     return sesssion.exec(select(jobs.platform).distinct(jobs.platform)).all()
 
+# function to get all the companies with selected job from the database 
 @app.get("/companies-with-x-job/", summary="companies with x job", description="Know which Company has most of x jobs")
 def get_companies_with_x_jobs(sel_job: str, session: Session=Depends(get_session)):
     statement=(
@@ -78,6 +87,7 @@ def get_companies_with_x_jobs(sel_job: str, session: Session=Depends(get_session
         for row in rows
         ]
 
+# function to get companies with x job roles and y job typesfrom the database 
 @app.get("/companies-with-x-job-y-job-type/", summary="companies with x job and y job type", description="Know which Company has most of x jobs and y job types")
 def get_companies_with_x_jobs_y_job_type(sel_job:str, sel_job_type: str ,session: Session=Depends(get_session)):
     statement=(
@@ -102,6 +112,7 @@ def get_companies_with_x_jobs_y_job_type(sel_job:str, sel_job_type: str ,session
         for row in rows
         ]
 
+# function to get all the companies of x job role and y job type on z platform  from the database 
 @app.get("/companies-with-x-job-y-job-type-on-platform-z/", summary="companies with x job and y job type on z platform", description="Know which Company has most of x jobs and y job types on z platform")
 def get_companies_with_x_jobs_y_job_type(sel_job: str, sel_job_type:str , sel_company: str,session: Session=Depends(get_session)):
     statement=(
@@ -126,6 +137,7 @@ def get_companies_with_x_jobs_y_job_type(sel_job: str, sel_job_type:str , sel_co
         for row in rows
         ]
 
+# function to fetch all the experince required for a job in a company from the database 
 @app.get('/get-ery-for-company-and-jobrole/')
 def get_ery_for_comp_jr(sel_comp: str, sel_job: str, session: Session=Depends(get_session)):
     statement=(
@@ -160,7 +172,8 @@ def get_ery_for_comp_jr(sel_comp: str, sel_job: str, session: Session=Depends(ge
     ]
     erylist.append({'average exp req':avg_ery[0]})
     return erylist
-    
+
+# function to fetch all the average salary expectation for a job and experience level from the database 
 @app.get('/exp-vs-sal-exp/')
 def exp_vs_sal(sel_job: str, sel_exp: int, session: Session=Depends(get_session)):
     
@@ -184,6 +197,7 @@ def exp_vs_sal(sel_job: str, sel_exp: int, session: Session=Depends(get_session)
         "q3": row.q3,
     }
 
+# function to fetch all the platform vs statuses data from the database 
 @app.get('/platform-vs-status/')
 def get_platform_vs_status(sel_job:str, session: Session=Depends(get_session)):
     statement=(
@@ -206,6 +220,7 @@ def get_platform_vs_status(sel_job:str, session: Session=Depends(get_session)):
         for row in rows
     ]
 
+# function to fetch all the salaries vs people count with statuses from the database 
 @app.get('/salary-expectation-vs-status-for-job/')
 def sal_vs_stat(sel_job:str, session:Session=Depends(get_session)):
     statement=(
