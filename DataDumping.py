@@ -6,6 +6,7 @@ jdata=getjobsdf()
 load_dotenv()
 db_url=os.getenv("DATABASE_URL")
 
+# creating database model
 class jobs(SQLModel, table=True):
     __tablename__="jobs"
     application_id :int =Field(default=None, primary_key=True)
@@ -21,6 +22,7 @@ class jobs(SQLModel, table=True):
 
 engine = create_engine(db_url)
 SQLModel.metadata.create_all(engine)
+# pushing to database
 try:
     jdata.to_sql('jobs', con=engine, if_exists='replace', index=False)
     print("DataFrame jobs successfully uploaded to the database.")
