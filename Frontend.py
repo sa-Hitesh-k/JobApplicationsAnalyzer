@@ -4,7 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-BASE_URL='http://127.0.0.1:8000'
+BASE_URL='https://jobapplicationsanalyzer.onrender.com'
 
 st.title("📊 JOB APPLICATIONS ANALYZER")
 
